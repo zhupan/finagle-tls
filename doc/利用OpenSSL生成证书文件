@@ -1,0 +1,36 @@
+利用OpenSSL生成库和命令程序,在生成的命令程序中包括对加/解密算法的测试,openssl程序,ca程序.利用openssl,ca可生成用于C/S模式的证书文件以及CA文件.下面以C/S模式说明证书文件的生成步骤:
+
+证书文件生成:
+一.服务器端
+    1.生成服务器端的私钥(key文件);
+      openssl genrsa -des3 -out server.key 1024
+    运行时会提示输入密码,此密码用于加密key文件(参数des3是加密算法,也可以选用其他安全的算法),以后每当需读取此文件(通过openssl提供的命令或API)都需输入口令.如果不要口令,则可用以下命令去除口令:
+    openssl rsa -in server.key -out server.key
+
+    2.生成服务器端证书签名请求文件(csr文件);
+      openssl req -new -key server.key -out server.csr
+    生成Certificate Signing Request（CSR）,生成的csr文件交给CA签名后形成服务端自己的证书.屏幕上将有提示,依照其提示一步一步输入要求的个人信息即可(如:Country,province,city,company等).
+
+二.客户端
+    1.对客户端也作同样的命令生成key及csr文件;
+    openssl genrsa -des3 -out client.key 1024
+    openssl req -new -key client.key -out client.csr
+
+三.生成CA证书文件
+    server.csr与client.csr文件必须有CA的签名才可形成证书.
+    1.首先生成CA的key文件:
+        openssl genrsa -des3 -out ca.key 1024
+    2.生成CA自签名证书:
+        openssl req -new -x509 -key ca.key -out ca.crt
+    可以加证书过期时间选项 "-days 365".
+
+四.利用CA证书进行签名
+    用生成的CA证书为server.csr,client.csr文件签名,利用openssl中附带的CA.pl文件(在安装目录中openssl/apps目录下),
+    1.ca.pl -newca, 在提示输入已有的证书文件时,输入上面已生成的ca.crt证书文件;
+    2.生成服务端证书文件
+      Openssl ca -in server.csr -out server.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
+    3.生成客户端证书文件
+      Openssl ca -in client.csr -out client.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
+必须保证openssl.cnf在当前目录下,这个文件可以在apps目录中找到.
+
+server.key,server.crt;client.key,client.crt;ca.key,ca.crt将在项目中被用到.
