@@ -1,0 +1,47 @@
+证书主要的文件类型和协议有: PEM、DER、PFX、JKS、KDB、CER、KEY、CSR、CRT、CRL 、OCSP、SCEP等。
+
+PEM – Openssl使用 PEM(Privacy Enhanced Mail)格式来存放各种信息,它是 openssl 默认采用的信息存放方式。Openssl 中的 PEM 文件一般包含如下信息:
+
+    内容类型:表明本文件存放的是什么信息内容,它的形式为“——-BEGIN XXXX ——”,与结尾的“——END XXXX——”对应。
+    头信息:表明数据是如果被处理后存放,openssl 中用的最多的是加密信息,比如加密算法以及初始化向量 iv。
+    信息体:为 BASE64 编码的数据。可以包括所有私钥（RSA 和 DSA）、公钥（RSA 和 DSA）和 (x509) 证书。它存储用 Base64 编码的 DER 格式数据，用 ascii 报头包围，因此适合系统之间的文本模式传输。 
+
+    使用PEM格式存储的证书：
+    —–BEGIN CERTIFICATE—–
+    MIICJjCCAdCgAwIBAgIBITANBgkqhkiG9w0BAQQFADCBqTELMAkGA1UEBhMCVVMx
+    ………
+    1p8h5vkHVbMu1frD1UgGnPlOO/K7Ig/KrsU=
+    —–END CERTIFICATE—–
+    使用PEM格式存储的私钥：
+    —–BEGIN RSA PRIVATE KEY—–
+    MIICJjCCAdCgAwIBAgIBITANBgkqhkiG9w0BAQQFADCBqTELMAkGA1UEBhMCVVMx
+    ………
+    1p8h5vkHVbMu1frD1UgGnPlOO/K7Ig/KrsU=
+    —–END RSA PRIVATE KEY—–
+    使用PEM格式存储的证书请求文件：
+    —–BEGIN CERTIFICATE REQUEST—–
+    MIICJjCCAdCgAwIBAgIBITANBgkqhkiG9w0BAQQFADCBqTELMAkGA1UEBhMCVVMx
+    ………
+    1p8h5vkHVbMu1frD1UgGnPlOO/K7Ig/KrsU=
+    —–END CERTIFICATE REQUEST—– 
+
+DER – 辨别编码规则 (DER) 可包含所有私钥、公钥和证书。它是大多数浏览器的缺省格式，并按 ASN1 DER 格式存储。它是无报头的 － PEM 是用文本报头包围的 DER。
+PFX 或 P12 – 公钥加密标准 #12 (PKCS#12) 可包含所有私钥、公钥和证书。其以二进制格式存储，也称为 PFX 文件。通常可以将Apache/OpenSSL使用的“KEY文件 + CRT文件”格式合并转换为标准的PFX文件，你可以将PFX文件格式导入到微软IIS 5/6、微软ISA、微软Exchange Server等软件。转换时需要输入PFX文件的加密密码。
+JKS – 通常可以将Apache/OpenSSL使用的“KEY文件 + CRT文件”格式”转换为标准的Java Key Store(JKS)文件。JKS文件格式被广泛的应用在基于JAVA的WEB服务器、应用服务器、中间件。你可以将JKS文件导入到TOMCAT、 WEBLOGIC 等软件。
+KDB – 通常可以将Apache/OpenSSL使用的“KEY文件 + CRT文件”格式转换为标准的IBM KDB文件。KDB文件格式被广泛的应用在IBM的WEB服务器、应用服务器、中间件。你可以将KDB文件导入到IBM HTTP Server、IBM Websphere 等软件。
+CSR － 证书请求文件(Certificate Signing Request)。生成 X509 数字证书前,一般先由用户提交证书申请文件,然后由 CA 来签发证书。大致过程如下(X509 证书申请的格式标准为 pkcs#10 和 rfc2314):
+
+    用户生成自己的公私钥对;
+    构造自己的证书申请文件,符合 PKCS#10 标准。该文件主要包括了用户信息、公钥以及一些可选的属性信息,并用自己的私钥给该内容签名;
+    用户将证书申请文件提交给 CA;
+    CA 验证签名,提取用户信息,并加上其他信息(比如颁发者等信息),用 CA 的私钥签发数字证书;
+    说明:数字证书(如x.509)是将用户(或其他实体)身份与公钥绑定的信息载体。一个合法的数字证书不仅要符合 X509 格式规范,还必须有 CA 的签名。用户不仅有自己的数字证书,还必须有对应的私钥。X509v3 数字证书主要包含的内容有:证书版本、证书序列号、签名算法、颁发者信息、有效时间、持有者信息、公钥信息、颁发者 ID、持有者 ID 和扩展项。 
+
+OCSP – 在线证书状态协议(OCSP,Online Certificate Status Protocol,rfc2560)用于实时表明证书状态。OCSP 客户端通过查询 OCSP 服务来确定一个证书的状态,可以提供给使用者一个或多个数字证书的有效性资料，它建立一个可实时响应的机制，让用户可以实时确认每一张证书的有效性，解决由CRL引发的安全问题。。OCSP 可以通过 HTTP协议来实现。rfc2560 定义了 OCSP 客户端和服务端的消息格式。
+CER  － 一般指使用DER格式的证书。
+CRT － 证书文件。可以是PEM格式。
+KEY   － 一般指PEM格式的私钥文件。
+CRL － 证书吊销列表 (Certification Revocation List) 是一种包含撤销的证书列表的签名数据结构。CRL 是证书撤销状态的公布形式,CRL 就像信用卡的黑名单,用于公布某些数字证书不再有效。CRL 是一种离线的证书状态信息。它以一定的周期进行更新。CRL 可以分为完全 CRL和增量 CRL。在完全 CRL 中包含了所有的被撤销证书信息,增量 CRL 由一系列的 CRL 来表明被撤销的证书信息,它每次发布的 CRL 是对前面发布 CRL 的增量扩充。基本的 CRL 信息有:被撤销证书序列号、撤销时间、撤销原因、签名者以及 CRL 签名等信息。基于 CRL 的验证是一种不严格的证书认证。CRL 能证明在 CRL 中被撤销的证书是无效的。但是,它不能给出不在 CRL 中的证书的状态。如果执行严格的认证,需要采用在线方式进行认证,即 OCSP 认证。一般是由CA签名的一组电子文档，包括了被废除证书的唯一标识（证书序列号），CRL用来列出已经过期或废除的数字证书。它每隔一段时间就会更新，因此必须定期下载该清单，才会取得最新信息。
+SCEP － 简单证书注册协议。基于文件的证书登记方式需要从您的本地计算机将文本文件复制和粘贴到证书发布中心，和从证书发布中心复制和粘贴到您的本地计算机。 SCEP可以自动处理这个过程但是CRLs仍然需要手工的在本地计算机和CA发布中心之间进行复制和粘贴。
+PKCS7 – 加密消息语法(pkcs7),是各种消息存放的格式标准。这些消息包括:数据、签名数据、数字信封、签名数字信封、摘要数据和加密数据。
+PKCS12 – pkcs12 (个人数字证书标准)用于存放用户证书、crl、用户私钥以及证书链。pkcs12 中的私钥是加密存放的。
