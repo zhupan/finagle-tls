@@ -34,3 +34,8 @@
 必须保证openssl.cnf在当前目录下,这个文件可以在apps目录中找到.
 
 server.key,server.crt;client.key,client.crt;ca.key,ca.crt将在项目中被用到.
+
+
+openssl x509 -outform der -in 96F1F5B87ACA69C9.pem -out server.der
+keytool -import -alias serverkey -file server.der -keystore tclient.keystore
+

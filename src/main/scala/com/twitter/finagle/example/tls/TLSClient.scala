@@ -13,8 +13,8 @@ object TLSClient {
       .codec(StringCodec)
       .hosts(new InetSocketAddress(8080))
       .hostConnectionLimit(1)
-//      .tls(createSslContext)
-      .tlsWithoutValidation()
+      .tls(createSslContext)
+//      .tlsWithoutValidation()
       .build()
 
 
@@ -28,15 +28,15 @@ object TLSClient {
   }
 
   private def createSslContext = {
-    val sslContext = SSLContext.getInstance("TLS")
-    val keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-    val trustManagerFactory = TrustManagerFactory.getInstance("SunX509")
-    val keyStore = KeyStore.getInstance("JKS")
+    val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
+    val trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
+    val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
     val trustKeyStore = KeyStore.getInstance("JKS")
-    keyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/client.key"), "derbysoft".toCharArray())
-    trustKeyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/client.crt"), "derbysoft".toCharArray())
+    keyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/tclient.keystore"), "derbysoft".toCharArray())
+    trustKeyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/tclient.keystore"), "derbysoft".toCharArray())
     keyManagerFactory.init(keyStore, "derbysoft".toCharArray())
     trustManagerFactory.init(trustKeyStore)
+    val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(keyManagerFactory.getKeyManagers, trustManagerFactory.getTrustManagers, null)
     sslContext
   }
