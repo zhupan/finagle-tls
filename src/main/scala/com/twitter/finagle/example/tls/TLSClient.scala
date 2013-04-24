@@ -5,7 +5,7 @@ import java.net.InetSocketAddress
 import com.twitter.finagle.Service
 import javax.net.ssl.{TrustManagerFactory, KeyManagerFactory, SSLContext}
 import java.security.KeyStore
-import java.io.FileInputStream
+import java.io.{File, FileInputStream}
 
 object TLSClient {
   def main(args: Array[String]) {
@@ -14,7 +14,6 @@ object TLSClient {
       .hosts(new InetSocketAddress(8080))
       .hostConnectionLimit(1)
       .tls(createSslContext)
-//      .tlsWithoutValidation()
       .build()
 
 
@@ -32,8 +31,9 @@ object TLSClient {
     val trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
     val trustKeyStore = KeyStore.getInstance("JKS")
-    keyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/tclient.keystore"), "derbysoft".toCharArray())
-    trustKeyStore.load(new FileInputStream("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/tclient.keystore"), "derbysoft".toCharArray())
+    val path = this.getClass.getResource("/").getPath + "ssl/"
+    keyStore.load(new FileInputStream(path + "tclient.keystore"), "derbysoft".toCharArray())
+    trustKeyStore.load(new FileInputStream(path + "tclient.keystore"), "derbysoft".toCharArray())
     keyManagerFactory.init(keyStore, "derbysoft".toCharArray())
     trustManagerFactory.init(trustKeyStore)
     val sslContext = SSLContext.getInstance("TLS")

@@ -16,8 +16,10 @@ object TLSServer {
       }
     }
 
+    val path = this.getClass.getResource("/").getPath + "ssl/"
+
     ServerBuilder().codec(StringCodec).bindTo(new InetSocketAddress(8080))
-      .tls("/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/server.crt", "/Users/zhupan/github/finagle-tls-example/src/main/resources/ssl/server.key")
+      .tls(path + "server.crt", path + "server.key")
       .name("TLSServer").build(service)
   }
 }
