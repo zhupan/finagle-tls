@@ -5,8 +5,11 @@ import java.net.InetSocketAddress
 import com.twitter.finagle.Service
 import javax.net.ssl.{TrustManagerFactory, KeyManagerFactory, SSLContext}
 import java.security.KeyStore
-import java.io.{File, FileInputStream}
-
+import java.io.{InputStream, File, FileInputStream}
+/**
+ * @author Panos Zhu
+ *         Email panos.zhu@gmail.com
+ */
 object TLSClient {
   def main(args: Array[String]) {
     val client: Service[String, String] = ClientBuilder()
@@ -31,10 +34,9 @@ object TLSClient {
     val trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
     val trustKeyStore = KeyStore.getInstance("JKS")
-    val path = this.getClass.getResource("/").getPath + "ssl/"
-    keyStore.load(new FileInputStream(path + "tclient.keystore"), "derbysoft".toCharArray())
-    trustKeyStore.load(new FileInputStream(path + "tclient.keystore"), "derbysoft".toCharArray())
-    keyManagerFactory.init(keyStore, "derbysoft".toCharArray())
+    keyStore.load(SslFile.keyStoreStream, SslFile.clientPassword.toCharArray)
+    trustKeyStore.load(SslFile.trustKeyStoreStream, SslFile.clientPassword.toCharArray)
+    keyManagerFactory.init(keyStore, SslFile.clientPassword.toCharArray)
     trustManagerFactory.init(trustKeyStore)
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(keyManagerFactory.getKeyManagers, trustManagerFactory.getTrustManagers, null)
