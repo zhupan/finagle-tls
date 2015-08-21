@@ -26,6 +26,6 @@ object SslFile {
 
   val trustKeyStoreStream = this.getClass.getResourceAsStream("/ssl/test/tclient.keystore")
 
-  val clientPassword = "test"
+  val clientPassword = "changeit"
 
 }
